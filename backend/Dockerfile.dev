@@ -1,0 +1,23 @@
+# Use Node.js LTS version (for development)
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and yarn.lock
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy source code
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose app port
+EXPOSE 3001
+
+# Start development server
+CMD ["yarn", "dev"]

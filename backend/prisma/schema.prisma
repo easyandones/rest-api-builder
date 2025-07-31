@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Resource definition model
+model Resource {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String?
+  description String?
+  tableName   String   @unique // Actual DB table name
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Resource fields
+  fields      Field[]
+  
+  @@map("resources")
+}
+
+// Field definition model
+model Field {
+  id          String       @id @default(cuid())
+  name        String       // Field name
+  displayName String?      // Display name
+  type        FieldType    // Field type
+  isRequired  Boolean      @default(false)
+  isUnique    Boolean      @default(false)
+  defaultValue String?     // Default value (JSON string)
+  validation   String?     // Validation rules (JSON string)
+  order       Int          @default(0) // Field order
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  // Relationship
+  resource    Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  resourceId  String
+  
+  @@unique([resourceId, name])
+  @@map("fields")
+}
+
+// Field type enumeration
+enum FieldType {
+  STRING
+  INTEGER
+  FLOAT
+  BOOLEAN
+  DATE
+  DATETIME
+  TEXT
+  JSON
+}
+
+// Migration history (optional)
+model Migration {
+  id          String   @id @default(cuid())
+  resourceId  String
+  operation   MigrationOperation
+  description String
+  sqlQuery    String?  // Executed SQL query
+  rollbackSql String?  // Rollback SQL
+  appliedAt   DateTime @default(now())
+  
+  @@map("migrations")
+}
+
+enum MigrationOperation {
+  CREATE_TABLE
+  DROP_TABLE
+  ADD_COLUMN
+  DROP_COLUMN
+  MODIFY_COLUMN
+  RENAME_COLUMN
+  RENAME_TABLE
+}
