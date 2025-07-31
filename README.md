@@ -62,8 +62,10 @@ A full-stack web application that allows users to dynamically define new resourc
    cd rest-api-builder
 
    # Setup environment variables
+   cd backend
    cp .env.example .env
-   # Edit .env file if needed (default values work for Docker)
+   cd ..
+   # Edit backend/.env file if needed (default values work for Docker)
    ```
 
 2. **Start all services**
