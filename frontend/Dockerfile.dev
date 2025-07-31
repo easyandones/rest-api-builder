@@ -1,0 +1,31 @@
+# Frontend Dockerfile for Development
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files (yarn이 우선)
+COPY package.json yarn.lock* package-lock.json* ./
+
+# Install dependencies
+RUN \
+  if [ -f yarn.lock ]; then yarn install; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Copy source code
+COPY . .
+
+# Set environment variables for Next.js dev server
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+
+# Expose port
+EXPOSE 3000
+
+# Run development server
+CMD \
+  if [ -f yarn.lock ]; then yarn dev; \
+  elif [ -f package-lock.json ]; then npm run dev; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
