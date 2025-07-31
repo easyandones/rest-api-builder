@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database (Development)
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rest_api_builder
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # Backend Development Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    restart: always
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/rest_api_builder?schema=public
+      PORT: 3001
+      CORS_ORIGIN: http://localhost:3000
+      API_PREFIX: /api
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    networks:
+      - app-network
+    command: >
+      sh -c "npx prisma migrate deploy &&
+             npx prisma generate &&
+             yarn dev"
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: always
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - /app/.next
+    networks:
+      - app-network
+    command: >
+      sh -c "if [ -f yarn.lock ]; then yarn dev; 
+             elif [ -f package-lock.json ]; then npm run dev; 
+             else echo 'Lockfile not found.' && exit 1; 
+             fi"
+
+volumes:
+  postgres_data_dev:
+  backend_node_modules:
+  frontend_node_modules:
+
+networks:
+  app-network:
+    driver: bridge
