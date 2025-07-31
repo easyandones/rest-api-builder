@@ -33,6 +33,7 @@ The React-based frontend component of the REST API Generator assignment. Provide
 
 ```bash
 # From project root
+cp .env.example .env  # Setup environment
 docker-compose up -d
 # Frontend available at http://localhost:3000
 ```

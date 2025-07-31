@@ -55,17 +55,25 @@ A full-stack web application that allows users to dynamically define new resourc
 
 ## 🚀 Quick Start (Docker - Recommended)
 
-1. **Clone and start the application**
+1. **Clone and setup environment**
 
    ```bash
    git clone <repository-url>
    cd rest-api-builder
 
+   # Setup environment variables
+   cp .env.example .env
+   # Edit .env file if needed (default values work for Docker)
+   ```
+
+2. **Start all services**
+
+   ```bash
    # Start all services (PostgreSQL, backend, frontend)
    docker-compose up -d
    ```
 
-2. **Access the application**
+3. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3001/api
    - Health Check: http://localhost:3001/health

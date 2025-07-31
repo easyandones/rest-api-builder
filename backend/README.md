@@ -38,6 +38,7 @@ The Node.js/Express backend component of the REST API Generator assignment. Prov
 
 ```bash
 # From project root
+cp .env.example .env  # Setup environment
 docker-compose up -d
 # Backend available at http://localhost:3001/api
 ```
