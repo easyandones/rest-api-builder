@@ -103,5 +103,5 @@ typings/
 Thumbs.db
 
 # Prisma
-prisma/migrations/
+# prisma/migrations/  # Keep migrations in git for schema tracking
 /src/generated/prisma
